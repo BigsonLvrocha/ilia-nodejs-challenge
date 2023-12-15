@@ -1,0 +1,28 @@
+{
+  "name": "ilia-node-js-challenge-wallet",
+  "version": "0.0.0",
+  "description": "ilia node js challenge for wallet",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "engines": {
+    "node": ">=20.10.0",
+    "npm": ">=10.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BigsonLvrocha/ilia-nodejs-challenge.git"
+  },
+  "keywords": [
+    "microsservice",
+    "node"
+  ],
+  "author": "Luiz Victor Linhares Rocha <luizvictorlrocha@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BigsonLvrocha/ilia-nodejs-challenge/issues"
+  },
+  "homepage": "https://github.com/BigsonLvrocha/ilia-nodejs-challenge#readme"
+}
