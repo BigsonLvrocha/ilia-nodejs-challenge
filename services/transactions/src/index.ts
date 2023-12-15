@@ -1,5 +1,5 @@
-export function hello() {
-    return 'hello world';
+export function hello(): string {
+  return "hello world";
 }
 
-console.log(hello())
+console.log(hello());
