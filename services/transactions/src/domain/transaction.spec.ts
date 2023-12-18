@@ -20,6 +20,7 @@ describe('Transaction', () => {
     expect(credit.amount).toBe(100);
     expect(credit.userId).toBe(userId);
     expect(credit.balanceChange).toBe(100);
+    expect(credit.id).toBeDefined();
   });
 
   it('creates a debit transaction', async () => {
@@ -36,6 +37,7 @@ describe('Transaction', () => {
     expect(credit.amount).toBe(100);
     expect(credit.userId).toBe(userId);
     expect(credit.balanceChange).toBe(-100);
+    expect(credit.id).toBeDefined();
   });
 
   it('throws an error when amount is less than 0', async () => {
