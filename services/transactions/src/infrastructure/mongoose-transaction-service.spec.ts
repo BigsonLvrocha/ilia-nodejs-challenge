@@ -59,6 +59,75 @@ describe('MongooseTransactionService', () => {
       });
 
       expect(createdTransaction).toBeDefined();
+      expect(createdTransaction?.id).toBe(transaction.id);
+      expect(createdTransaction?.balanceChange).toBe(transaction.balanceChange);
+      expect(createdTransaction?.timestamp).toBe(transaction.timestamp);
+      expect(createdTransaction?.userId).toBe(transaction.userId);
+    });
+  });
+
+  describe('find', () => {
+    const userId = uuid();
+
+    const transactionsInDb = [
+      {
+        id: uuid(),
+        userId,
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId,
+        balanceChange: -100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId: uuid(),
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+    ];
+
+    beforeEach(async () => {
+      await transactionModel.create(transactionsInDb);
+    });
+
+    it('finds all transactions for a user', async () => {
+      const transactions = await transactionService.find({
+        userId,
+      });
+
+      expect(transactions).toHaveLength(2);
+
+      const transaction0 = transactions.find(
+        (t) => t.id === transactionsInDb[0].id
+      );
+      expect(transaction0).toBeDefined();
+      expect(transaction0?.type).toBe(TransactionType.CREDIT);
+      expect(transaction0?.amount).toBe(100);
+
+      const transaction1 = transactions.find(
+        (t) => t.id === transactionsInDb[1].id
+      );
+      expect(transaction1).toBeDefined();
+      expect(transaction1?.type).toBe(TransactionType.DEBIT);
+      expect(transaction1?.amount).toBe(100);
+    });
+
+    it('filters by type', async () => {
+      const transactions = await transactionService.find({
+        userId,
+        type: TransactionType.CREDIT,
+      });
+
+      expect(transactions).toHaveLength(1);
+
+      const transaction = transactions[0];
+      expect(transaction.id).toBe(transactionsInDb[0].id);
+      expect(transaction.type).toBe(TransactionType.CREDIT);
+      expect(transaction.amount).toBe(100);
     });
   });
 });
