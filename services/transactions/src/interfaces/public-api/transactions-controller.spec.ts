@@ -134,4 +134,40 @@ describe('TransactionsController', () => {
         .expect(400);
     });
   });
+
+  describe('POST /transactions', () => {
+    const transactions = [
+      {
+        id: uuid(),
+        userId,
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId,
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId,
+        balanceChange: -100,
+        timestamp: new Date(),
+      },
+    ];
+
+    beforeEach(async () => {
+      await transactionModel.create(transactions);
+    });
+
+    it('returns the transactions', async () => {
+      const response = await supertest(app.getHttpServer())
+        .get('/transactions')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      expect(response.body).toHaveLength(3);
+    });
+  });
 });
