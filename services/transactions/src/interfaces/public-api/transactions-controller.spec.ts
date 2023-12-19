@@ -42,7 +42,7 @@ describe('TransactionsController', () => {
     const configService = testModule.get(ConfigService);
     jwtToken = jwt.sign(
       { userId },
-      configService.get('PUBLIC_API_JWT_SECRET') ?? 'ILIACHALLENGE',
+      configService.get('PUBLIC_API_JWT_SECRET') ?? 'default-secret',
       { expiresIn: '1h' }
     );
 
