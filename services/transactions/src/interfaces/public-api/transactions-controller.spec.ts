@@ -169,5 +169,13 @@ describe('TransactionsController', () => {
 
       expect(response.body).toHaveLength(3);
     });
+
+    it('throws 400 if type is invalid', async () => {
+      await supertest(app.getHttpServer())
+        .get('/transactions')
+        .query({ type: 'INVALID' })
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(400);
+    });
   });
 });
