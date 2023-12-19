@@ -61,7 +61,9 @@ describe('MongooseTransactionService', () => {
       expect(createdTransaction).toBeDefined();
       expect(createdTransaction?.id).toBe(transaction.id);
       expect(createdTransaction?.balanceChange).toBe(transaction.balanceChange);
-      expect(createdTransaction?.timestamp).toBe(transaction.timestamp);
+      expect(createdTransaction?.timestamp).toStrictEqual(
+        transaction.timestamp
+      );
       expect(createdTransaction?.userId).toBe(transaction.userId);
     });
   });
