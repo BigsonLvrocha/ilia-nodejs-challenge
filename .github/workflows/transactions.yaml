@@ -25,9 +25,9 @@ jobs:
       - name: Restore cached node_modules
         uses: actions/cache/restore@v3
         with:
-          path: ./services/transactions/node_modules
-          key: users-service-node-modules
-      
+          path: ./services/users/node_modules
+          key: transactions-service-node-modules
+
       - run: npm ci
         working-directory: './services/transactions'
 
@@ -41,7 +41,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: ./services/transactions/node_modules
-          key: users-service-node-modules
+          key: transactions-service-node-modules
 
       - run: npm test
         working-directory: './services/transactions'
