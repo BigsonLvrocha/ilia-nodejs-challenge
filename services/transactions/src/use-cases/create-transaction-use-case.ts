@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { type TransactionType } from '../domain/transaction-type.enum.js';
 import { TransactionProviderEnum } from '../transactions-providers.enum.js';
 import { TransactionServiceInterface } from '../domain/transaction-service-interface.js';
@@ -15,8 +15,10 @@ interface CreateTransactionUseCaseResponse {
   userId: string;
   amount: number;
   type: TransactionType;
+  id: string;
 }
 
+@Injectable()
 export class CreateTransactionUseCase
   implements
     UseCase<CreateTransactionUseCaseDto, CreateTransactionUseCaseResponse>
@@ -41,6 +43,7 @@ export class CreateTransactionUseCase
       userId: transaction.userId,
       amount: transaction.amount,
       type: transaction.type,
+      id: transaction.id,
     };
   }
 }
