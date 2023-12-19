@@ -7,7 +7,7 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { TransactionsPublicApiModule } from './transactions-public-api.module.js';
-import { type INestApplication } from '@nestjs/common';
+import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import {
   TransactionDefinition,
   type TransactionModel,
@@ -34,6 +34,7 @@ describe('TransactionsController', () => {
       ],
     }).compile();
     app = testModule.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
 
     transactionModel = testModule.get(
       getModelToken(TransactionDefinition.name)
@@ -80,6 +81,57 @@ describe('TransactionsController', () => {
 
       expect(transactionsInDb).toHaveLength(1);
       expect(transactionsInDb[0].balanceChange).toBe(100);
+    });
+
+    it('returns 401 if the token is invalid', async () => {
+      await supertest(app.getHttpServer())
+        .post('/transactions')
+        .set('Accept', 'application/json')
+        .send({
+          amount: 100,
+          type: 'CREDIT',
+          userId,
+        })
+        .expect(401);
+    });
+
+    it('returns 400 if type is not CREDIT nor DEBIT', async () => {
+      await supertest(app.getHttpServer())
+        .post('/transactions')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          amount: 100,
+          type: 'CREDITA',
+          userId,
+        })
+        .expect(400);
+    });
+
+    it('returns 400 if amount is not int', async () => {
+      await supertest(app.getHttpServer())
+        .post('/transactions')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          amount: 100.1,
+          type: 'CREDIT',
+          userId,
+        })
+        .expect(400);
+    });
+
+    it('returns 400 if amount is not positive', async () => {
+      await supertest(app.getHttpServer())
+        .post('/transactions')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          amount: -100,
+          type: 'CREDIT',
+          userId,
+        })
+        .expect(400);
     });
   });
 });
