@@ -9,4 +9,5 @@ export interface TransactionFindOptions {
 export interface TransactionServiceInterface {
   create: (transaction: Transaction) => Promise<void>;
   find: (options: TransactionFindOptions) => Promise<Transaction[]>;
+  getBalance: (userId: string) => Promise<number>;
 }

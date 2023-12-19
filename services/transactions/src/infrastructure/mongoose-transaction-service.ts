@@ -53,4 +53,22 @@ export class MongooseTransactionService implements TransactionServiceInterface {
         })
     );
   }
+
+  async getBalance(userId: string): Promise<number> {
+    const result = await this.transactionModel.aggregate([
+      {
+        $match: { userId },
+      },
+      {
+        $group: {
+          _id: '$userId',
+          total: {
+            $sum: '$balanceChange',
+          },
+        },
+      },
+    ]);
+
+    return result[0].total;
+  }
 }

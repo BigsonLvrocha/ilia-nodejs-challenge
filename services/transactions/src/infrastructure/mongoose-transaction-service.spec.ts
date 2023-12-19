@@ -132,4 +132,63 @@ describe('MongooseTransactionService', () => {
       expect(transaction.amount).toBe(100);
     });
   });
+
+  describe('getBalance', () => {
+    const userId = uuid();
+
+    const transactionsInDb = [
+      {
+        id: uuid(),
+        userId,
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId,
+        balanceChange: -100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId: uuid(),
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+    ];
+
+    beforeEach(async () => {
+      await transactionModel.create(transactionsInDb);
+    });
+
+    it('gets the total balance for userId', async () => {
+      const balance = await transactionService.getBalance(userId);
+
+      expect(balance).toEqual(0);
+    });
+
+    it('gets the positive total balance for userId', async () => {
+      await transactionModel.create({
+        balanceChange: 30,
+        id: uuid(),
+        timestamp: new Date(),
+        userId,
+      });
+      const balance = await transactionService.getBalance(userId);
+
+      expect(balance).toEqual(30);
+    });
+
+    it('gets the negative total balance for userId', async () => {
+      await transactionModel.create({
+        balanceChange: -30,
+        id: uuid(),
+        timestamp: new Date(),
+        userId,
+      });
+      const balance = await transactionService.getBalance(userId);
+
+      expect(balance).toEqual(-30);
+    });
+  });
 });
