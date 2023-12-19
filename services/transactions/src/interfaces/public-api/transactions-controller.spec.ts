@@ -134,4 +134,67 @@ describe('TransactionsController', () => {
         .expect(400);
     });
   });
+
+  describe('POST /transactions', () => {
+    const transactions = [
+      {
+        id: uuid(),
+        userId,
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId,
+        balanceChange: 100,
+        timestamp: new Date(),
+      },
+      {
+        id: uuid(),
+        userId,
+        balanceChange: -100,
+        timestamp: new Date(),
+      },
+    ];
+
+    beforeEach(async () => {
+      await transactionModel.create(transactions);
+    });
+
+    it('returns the transactions', async () => {
+      const response = await supertest(app.getHttpServer())
+        .get('/transactions')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      expect(response.body).toHaveLength(3);
+    });
+
+    it('throws 400 if type is invalid', async () => {
+      await supertest(app.getHttpServer())
+        .get('/transactions')
+        .query({ type: 'INVALID' })
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(400);
+    });
+
+    it('returns only debit transactions', async () => {
+      const result = await supertest(app.getHttpServer())
+        .get('/transactions')
+        .query({ type: 'DEBIT' })
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200);
+
+      expect(result.body).toHaveLength(1);
+      expect(result.body[0].id).toBe(transactions[2].id);
+    });
+
+    it('returns 401 when auth token is invalid', async () => {
+      await supertest(app.getHttpServer())
+        .get('/transactions')
+        .query({ type: 'DEBIT' })
+        .set('Authorization', `Bearer ${jwtToken}-invalid`)
+        .expect(401);
+    });
+  });
 });

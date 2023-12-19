@@ -7,6 +7,7 @@ import {
 import { TransactionProviderEnum } from './transactions-providers.enum.js';
 import { MongooseTransactionService } from './infrastructure/mongoose-transaction-service.js';
 import { CreateTransactionUseCase } from './use-cases/create-transaction-use-case.js';
+import { ListTransactionsUseCase } from './use-cases/list-transactions-use-case.js';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { CreateTransactionUseCase } from './use-cases/create-transaction-use-cas
       useClass: MongooseTransactionService,
     },
     CreateTransactionUseCase,
+    ListTransactionsUseCase,
   ],
-  exports: [CreateTransactionUseCase],
+  exports: [CreateTransactionUseCase, ListTransactionsUseCase],
 })
 export class TransactionsModule {}
