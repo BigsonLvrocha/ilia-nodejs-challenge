@@ -25,7 +25,9 @@ describe('MongooseTransactionService', () => {
     server = await MongoMemoryServer.create();
     module = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot(),
+        ConfigModule.forRoot({
+          isGlobal: true,
+        }),
         MongooseModule.forRoot(server.getUri()),
         TransactionsModule,
       ],
