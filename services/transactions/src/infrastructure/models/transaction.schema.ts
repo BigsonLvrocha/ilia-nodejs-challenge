@@ -1,4 +1,4 @@
-import { Types, Decimal128, type HydratedDocument, type Model } from 'mongoose';
+import { type HydratedDocument, type Model } from 'mongoose';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()
@@ -10,17 +10,18 @@ export class TransactionDefinition {
 
   @Prop({
     required: true,
+    index: true,
   })
   userId!: string;
 
   @Prop({
     required: true,
-    type: Types.Decimal128,
   })
-  balanceChange!: Decimal128;
+  balanceChange!: number;
 
   @Prop({
     required: true,
+    index: true,
     default: Date.now,
   })
   timestamp!: Date;
