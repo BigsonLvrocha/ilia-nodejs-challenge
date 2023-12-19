@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { InvalidAmountError } from './errors/invalid-amount-error.js';
 import { TransactionType } from './transaction-type.enum.js';
+import { NonIntegerAmountError } from './errors/non-integer-amount-error.js';
 
 interface TransactionArguments {
   id?: string;
@@ -38,6 +39,9 @@ export class Transaction {
   private validateAmount(amount: number): void {
     if (amount < 0) {
       throw new InvalidAmountError();
+    }
+    if (!Number.isInteger(amount)) {
+      throw new NonIntegerAmountError();
     }
   }
 }
