@@ -4,6 +4,7 @@ import { describe, it, expect } from '@jest/globals';
 import { TransactionType } from './transaction-type.enum.js';
 import { Transaction } from './transactions.js';
 import { InvalidAmountError } from './errors/invalid-amount-error.js';
+import { NonIntegerAmountError } from './errors/non-integer-amount-error.js';
 
 describe('Transaction', () => {
   it('creates a credit transaction', async () => {
@@ -49,5 +50,16 @@ describe('Transaction', () => {
           userId: uuid(),
         })
     ).toThrow(InvalidAmountError);
+  });
+
+  it('throws an error when amount is not an integer', async () => {
+    expect(
+      () =>
+        new Transaction({
+          type: TransactionType.DEBIT,
+          amount: 100.1,
+          userId: uuid(),
+        })
+    ).toThrow(NonIntegerAmountError);
   });
 });

@@ -39,5 +39,8 @@ export class Transaction {
     if (amount < 0) {
       throw new InvalidAmountError();
     }
+    if (!Number.isInteger(amount)) {
+      throw new InvalidAmountError();
+    }
   }
 }
