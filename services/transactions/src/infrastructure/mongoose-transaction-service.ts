@@ -10,7 +10,9 @@ import {
   TransactionModel,
 } from './models/transaction.schema.js';
 import { TransactionType } from '../domain/transaction-type.enum.js';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class MongooseTransactionService implements TransactionServiceInterface {
   constructor(
     @InjectModel(TransactionDefinition.name)
