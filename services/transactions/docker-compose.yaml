@@ -1,0 +1,34 @@
+services:
+  transactions-db:
+    image: mongo
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+    networks:
+      - ilia-code-challenge
+    volumes:
+      - transactions-db:/data/db
+
+  transactions:
+    build: .
+    image: bigsonlvrocha/ilia-code-challenge-transactions
+    environment:
+      MONGODB_URI: mongodb://transactions-db:27017
+      PUBLIC_API_JWT_SECRET: ILIACHALLENGE
+      PRIVATE_API_JWT_SECRET: ILIACHALLENGE_IN
+    ports:
+      - 3001:3001
+      - 3003:3003
+    depends_on:
+      - transactions-db
+    networks:
+      - ilia-code-challenge
+
+
+networks:
+  ilia-code-challenge:
+    driver: bridge
+    name: ilia-code-challenge
+
+volumes:
+  transactions-db:
