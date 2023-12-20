@@ -8,14 +8,14 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { CreateTransactionUseCase } from '../../use-cases/create-transaction-use-case.js';
-import { AuthGuard } from './auth/auth-guard.js';
+import { CreateTransactionUseCase } from '../../../use-cases/create-transaction-use-case.js';
+import { AuthGuard } from '../auth/auth-guard.js';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { TransactionDto } from './transaction.dto.js';
-import { type TransactionModelDto } from './transaction-model.dto.js';
-import { User } from './auth/user.decorator.js';
-import { AuthUser } from './auth/auth-types.js';
-import { ListTransactionsUseCase } from '../../use-cases/list-transactions-use-case.js';
+import { TransactionRequestDto } from './transaction.request.dto.js';
+import { type TransactionResponseDto } from './transaction.response.dto.js';
+import { User } from '../auth/user.decorator.js';
+import { AuthUser } from '../auth/auth-types.js';
+import { ListTransactionsUseCase } from '../../../use-cases/list-transactions-use-case.js';
 import { ListTransactionsRequestDto } from './list-transactions.request.dto.js';
 
 @Controller('transactions')
@@ -30,9 +30,9 @@ export class TransactionsController {
   @HttpCode(200)
   @Post()
   async createTransaction(
-    @Body() transaction: TransactionDto,
+    @Body() transaction: TransactionRequestDto,
     @User() user: AuthUser
-  ): Promise<TransactionModelDto> {
+  ): Promise<TransactionResponseDto> {
     if (user.userId !== transaction.userId) {
       throw new UnauthorizedException('Invalid user');
     }
@@ -51,7 +51,7 @@ export class TransactionsController {
   async listTransactions(
     @Query() query: ListTransactionsRequestDto,
     @User() user: AuthUser
-  ): Promise<TransactionModelDto[]> {
+  ): Promise<TransactionResponseDto[]> {
     const results = await this.listTransactionsUseCase.execute({
       userId: user.userId,
       type: query.type,
