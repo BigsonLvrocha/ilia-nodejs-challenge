@@ -20,6 +20,8 @@ export class UserDefinition {
 
   @Prop({
     required: true,
+    index: true,
+    unique: true,
   })
   email!: string;
 
