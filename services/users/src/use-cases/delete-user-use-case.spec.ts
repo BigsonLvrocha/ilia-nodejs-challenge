@@ -4,7 +4,7 @@ import { Test } from '@nestjs/testing';
 import { User } from '../domain/user.js';
 import { DeleteUserUseCase } from './delete-user-use-case.js';
 import { UserNotFoundException } from '../domain/error/user-not-found-exception.js';
-import { UserHashBalanceException } from '../domain/error/user-has-balance-exception.js';
+import { UserHasBalanceException } from '../domain/error/user-has-balance-exception.js';
 
 describe('delete user use case', () => {
   const userRepositoryMockFactory = (): {
@@ -80,7 +80,7 @@ describe('delete user use case', () => {
     transactionsServiceMock.getBalance.mockResolvedValueOnce(100);
 
     await expect(useCase.execute({ id: user.id })).rejects.toThrowError(
-      UserHashBalanceException
+      UserHasBalanceException
     );
   });
 });

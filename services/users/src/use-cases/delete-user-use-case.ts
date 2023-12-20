@@ -3,7 +3,7 @@ import { providersEnum } from '../providers.enum.js';
 import { UserRepositoryInterface } from '../domain/user-repository-interface.js';
 import { type UseCaseInterface } from './use-case-interface.js';
 import { UserNotFoundException } from '../domain/error/user-not-found-exception.js';
-import { UserHashBalanceException } from '../domain/error/user-has-balance-exception.js';
+import { UserHasBalanceException } from '../domain/error/user-has-balance-exception.js';
 import { TransactionsServiceInterface } from '../domain/transactions-service-interface.js';
 
 interface DeleteUserUseCaseRequest {
@@ -35,7 +35,7 @@ export class DeleteUserUseCase
     const balance = await this.transactionsService.getBalance(user.id);
 
     if (balance !== 0) {
-      throw new UserHashBalanceException();
+      throw new UserHasBalanceException();
     }
 
     await this.userRepository.delete(user);
