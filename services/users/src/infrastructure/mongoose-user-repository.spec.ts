@@ -174,4 +174,25 @@ describe('MongooseUserRepository', () => {
       expect(user?.passwordHash).toEqual(userData.passwordHash);
     });
   });
+
+  describe('delete', () => {
+    const userData = {
+      id: uuid(),
+      email: 'john@gmail.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      passwordHash: 'password',
+    };
+
+    beforeEach(async () => {
+      await userModel.create(userData);
+    });
+
+    it('deletes user', async () => {
+      await userRepository.delete(new User(userData));
+
+      const users = await userModel.find({ deletedAt: null }).exec();
+      expect(users).toHaveLength(0);
+    });
+  });
 });

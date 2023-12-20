@@ -72,4 +72,8 @@ export class MongooseUserRepository implements UserRepositoryInterface {
         })
       : null;
   }
+
+  async delete(user: User): Promise<void> {
+    await this.userModel.updateOne({ id: user.id }, { deletedAt: new Date() });
+  }
 }
