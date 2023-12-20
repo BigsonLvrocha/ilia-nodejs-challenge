@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing';
 import { User } from '../domain/user.js';
 import { DeleteUserUseCase } from './delete-user-use-case.js';
 import { UserNotFoundException } from '../domain/error/user-not-found-exception.js';
+import { UserHashBalanceException } from '../domain/error/user-has-balance-exception.js';
 
 describe('delete user use case', () => {
   const userRepositoryMockFactory = (): {
@@ -14,7 +15,16 @@ describe('delete user use case', () => {
     findById: jest.fn(async () => null),
   });
 
+  const transactionsServiceMockFactory = (): {
+    getBalance: jest.Mock<() => Promise<number>>;
+  } => ({
+    getBalance: jest.fn(async () => 0),
+  });
+
   let userRepositoryMock: ReturnType<typeof userRepositoryMockFactory>;
+  let transactionsServiceMock: ReturnType<
+    typeof transactionsServiceMockFactory
+  >;
   let useCase: DeleteUserUseCase;
   let user: User;
 
@@ -26,10 +36,15 @@ describe('delete user use case', () => {
           provide: providersEnum.UserRepository,
           useFactory: userRepositoryMockFactory,
         },
+        {
+          provide: providersEnum.TransactionsService,
+          useFactory: transactionsServiceMockFactory,
+        },
       ],
     }).compile();
 
     userRepositoryMock = testModule.get(providersEnum.UserRepository);
+    transactionsServiceMock = testModule.get(providersEnum.TransactionsService);
     useCase = testModule.get(DeleteUserUseCase);
     user = await User.createNewUser({
       email: 'john@gmail.com',
@@ -48,6 +63,8 @@ describe('delete user use case', () => {
     expect(userRepositoryMock.delete).toHaveBeenCalledWith(user);
     expect(userRepositoryMock.findById).toHaveBeenCalledTimes(1);
     expect(userRepositoryMock.findById).toHaveBeenCalledWith(user.id);
+    expect(transactionsServiceMock.getBalance).toHaveBeenCalledTimes(1);
+    expect(transactionsServiceMock.getBalance).toHaveBeenCalledWith(user.id);
   });
 
   it('throws error when user is not found', async () => {
@@ -55,6 +72,15 @@ describe('delete user use case', () => {
 
     await expect(useCase.execute({ id: user.id })).rejects.toThrowError(
       UserNotFoundException
+    );
+  });
+
+  it('throws eror when user has balance', async () => {
+    userRepositoryMock.findById.mockResolvedValueOnce(user);
+    transactionsServiceMock.getBalance.mockResolvedValueOnce(100);
+
+    await expect(useCase.execute({ id: user.id })).rejects.toThrowError(
+      UserHashBalanceException
     );
   });
 });
