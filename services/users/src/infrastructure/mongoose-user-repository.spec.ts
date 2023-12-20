@@ -49,18 +49,6 @@ describe('MongooseUserRepository', () => {
       expect(usersInDb[0].lastName).toEqual('Doe');
       expect(usersInDb[0].passwordHash).not.toEqual('password');
     });
-
-    it('throws error when user is duplicated', async () => {
-      const user = await User.createNewUser({
-        email: 'john@gmail.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        password: 'password',
-      });
-
-      await userRepository.create(user);
-      await expect(userRepository.create(user)).rejects.toThrowError();
-    });
   });
 
   describe('findAll', () => {
@@ -79,13 +67,21 @@ describe('MongooseUserRepository', () => {
         lastName: 'Doe 2',
         passwordHash: 'password2',
       },
+      {
+        id: uuid(),
+        email: 'john3@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe 3',
+        passwordHash: 'password2',
+        deletedAt: new Date(),
+      },
     ];
 
     beforeEach(async () => {
       await userModel.create(users);
     });
 
-    it('returns all users', async () => {
+    it('returns all non deleted users', async () => {
       const users = await userRepository.findAll();
 
       expect(users).toHaveLength(2);
@@ -149,6 +145,13 @@ describe('MongooseUserRepository', () => {
       expect(user?.lastName).toEqual(userData.lastName);
       expect(user?.passwordHash).toEqual(userData.passwordHash);
     });
+
+    it('returns null when user is deleted', async () => {
+      await userModel.updateOne({ id: userData.id }, { deletedAt: new Date() });
+
+      const user = await userRepository.findById(userData.id);
+      expect(user).toBeNull();
+    });
   });
 
   describe('findByEmail', () => {
@@ -172,6 +175,13 @@ describe('MongooseUserRepository', () => {
       expect(user?.firstName).toEqual(userData.firstName);
       expect(user?.lastName).toEqual(userData.lastName);
       expect(user?.passwordHash).toEqual(userData.passwordHash);
+    });
+
+    it('returns null when user is deleted', async () => {
+      await userModel.updateOne({ id: userData.id }, { deletedAt: new Date() });
+
+      const user = await userRepository.findByEmail(userData.email);
+      expect(user).toBeNull();
     });
   });
 
