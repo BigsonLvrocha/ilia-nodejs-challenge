@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { describe, beforeEach, it, expect, afterEach } from '@jest/globals';
@@ -88,6 +89,65 @@ describe('MongooseUserRepository', () => {
       const users = await userRepository.findAll();
 
       expect(users).toHaveLength(2);
+    });
+  });
+
+  describe('update', () => {
+    const userData = {
+      id: uuid(),
+      email: 'john@gmail.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      passwordHash: 'password',
+    };
+
+    beforeEach(async () => {
+      await userModel.create(userData);
+    });
+
+    it('updates user data', async () => {
+      const userEntity = new User(userData);
+
+      await userEntity.changePassword('password2');
+      userEntity.changeFirstName('John 2');
+      userEntity.changeLastName('Doe 2');
+      userEntity.changeEmail('john2@gmail.com');
+
+      await userRepository.update(userEntity);
+
+      const usersInDb = await userModel.find().exec();
+      expect(usersInDb).toHaveLength(1);
+      expect(usersInDb[0].email).toEqual('john2@gmail.com');
+      expect(usersInDb[0].firstName).toEqual('John 2');
+      expect(usersInDb[0].lastName).toEqual('Doe 2');
+      expect(usersInDb[0].passwordHash).not.toEqual('password');
+      expect(await bcrypt.compare('password2', usersInDb[0].passwordHash)).toBe(
+        true
+      );
+    });
+  });
+
+  describe('findById', () => {
+    const userData = {
+      id: uuid(),
+      email: 'john@gmail.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      passwordHash: 'password',
+    };
+
+    beforeEach(async () => {
+      await userModel.create(userData);
+    });
+
+    it('returns user by id', async () => {
+      const user = await userRepository.findById(userData.id);
+      expect(user).toBeInstanceOf(User);
+      expect(user?.id).toEqual(userData.id);
+      expect(user?.email).toEqual(userData.email);
+      expect(user?.firstName).toEqual(userData.firstName);
+      expect(user?.lastName).toEqual(userData.lastName);
+      expect(user?.passwordHash).toEqual(userData.passwordHash);
     });
   });
 });
