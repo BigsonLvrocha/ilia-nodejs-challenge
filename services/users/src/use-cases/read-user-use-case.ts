@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { type UseCaseInterface } from './use-case-interface.js';
 import { providersEnum } from '../providers.enum.js';
 import { UserRepositoryInterface } from '../domain/user-repository-interface.js';
@@ -15,6 +15,7 @@ interface ReadUserUseCaseResponse {
   email: string;
 }
 
+@Injectable()
 export class ReadUserUseCase
   implements UseCaseInterface<ReadUserUseCaseRequest, ReadUserUseCaseResponse>
 {
