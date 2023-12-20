@@ -219,5 +219,16 @@ describe('UserController', () => {
         })
         .expect(401);
     });
+
+    it('return 401 id is not the same as user id', async () => {
+      await supertest(app.getHttpServer())
+        .patch(`/users/${uuid()}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          first_name: 'Jane',
+          last_name: 'Doe',
+        })
+        .expect(401);
+    });
   });
 });

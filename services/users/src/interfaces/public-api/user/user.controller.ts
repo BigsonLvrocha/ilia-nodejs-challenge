@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ListUsersUseCase } from '../../../use-cases/list-users-use-case.js';
@@ -16,6 +17,8 @@ import { UserRequestDto } from './user.request.dto.js';
 import { ReadUserUseCase } from '../../../use-cases/read-user-use-case.js';
 import { UpdateUserUseCase } from '../../../use-cases/update-user-use-case.js';
 import { PatchUserRequestDto } from './patch-user.request.dto.js';
+import { User } from '../auth/user.decorator.js';
+import { ApiUser } from '../auth/api-user.js';
 
 @Controller('users')
 export class UserController {
@@ -72,8 +75,12 @@ export class UserController {
   @UseGuards(AuthGuard)
   async updateUser(
     @Param('id') id: string,
-    @Body() data: PatchUserRequestDto
+    @Body() data: PatchUserRequestDto,
+    @User() apiUser: ApiUser
   ): Promise<UserResponseDto> {
+    if (id !== apiUser.userId) {
+      throw new UnauthorizedException();
+    }
     const user = await this.updateUserUseCase.execute({
       userId: id,
       data: {
