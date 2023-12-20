@@ -200,9 +200,11 @@ describe('UserController', () => {
     });
 
     it('returns 404 when user is not found', async () => {
+      const newUserId = uuid();
+      const newUserToken = await jwtService.signAsync({ userId: newUserId });
       await supertest(app.getHttpServer())
-        .patch(`/users/${uuid()}`)
-        .set('Authorization', `Bearer ${userToken}`)
+        .patch(`/users/${newUserId}`)
+        .set('Authorization', `Bearer ${newUserToken}`)
         .send({
           first_name: 'Jane',
           last_name: 'Doe',
