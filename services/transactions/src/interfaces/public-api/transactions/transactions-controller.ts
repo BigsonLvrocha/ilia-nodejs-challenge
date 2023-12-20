@@ -33,10 +33,14 @@ export class TransactionsController {
     @Body() transaction: TransactionRequestDto,
     @User() user: ApiUser
   ): Promise<TransactionResponseDto> {
-    if (user.userId !== transaction.userId) {
+    if (user.userId !== transaction.user_id) {
       throw new UnauthorizedException('Invalid user');
     }
-    const result = await this.createTransactionUseCase.execute(transaction);
+    const result = await this.createTransactionUseCase.execute({
+      userId: transaction.user_id,
+      amount: transaction.amount,
+      type: transaction.type,
+    });
     return {
       amount: result.amount,
       user_id: result.userId,
