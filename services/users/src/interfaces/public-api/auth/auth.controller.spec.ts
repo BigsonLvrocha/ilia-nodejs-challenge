@@ -21,6 +21,7 @@ describe('AuthController', () => {
   let app: NestApplication;
   let userModel: UserModel;
   let jwtService: JwtService;
+  const testSecret = 'test-public-api-jwt-secret';
 
   const userData = {
     id: uuid(),
@@ -34,7 +35,15 @@ describe('AuthController', () => {
     mongoServer = await MongoMemoryServer.create();
     testModule = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({
+          isGlobal: true,
+          load: [
+            () => ({
+              PUBLIC_API_JWT_SECRET: testSecret,
+              PRIVATE_API_JWT_SECRET: 'test-private-api-jwt-secret',
+            }),
+          ],
+        }),
         MongooseModule.forRootAsync({
           useFactory: async () => ({
             uri: mongoServer.getUri(),
@@ -49,7 +58,7 @@ describe('AuthController', () => {
 
     await app.init();
     userModel = testModule.get<UserModel>(getModelToken(UserDefinition.name));
-    jwtService = testModule.get<JwtService>(JwtService);
+    jwtService = testModule.get(JwtService);
 
     await userModel.create(userData);
   });
@@ -70,7 +79,10 @@ describe('AuthController', () => {
       expect(response.body).toHaveProperty('token');
 
       const payload = await jwtService.verifyAsync(
-        response.body.token as string
+        response.body.token as string,
+        {
+          secret: testSecret,
+        }
       );
 
       expect(payload.userId).toEqual(userData.id);

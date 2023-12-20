@@ -10,15 +10,13 @@ import { type Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  private readonly secret: string;
+  private readonly secret: string | undefined;
 
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
   ) {
-    this.secret =
-      this.configService.get<string>('PUBLIC_API_JWT_SECRET') ??
-      'default-secret';
+    this.secret = this.configService.get<string>('PUBLIC_API_JWT_SECRET');
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
