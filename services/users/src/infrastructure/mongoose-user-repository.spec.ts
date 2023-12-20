@@ -47,5 +47,17 @@ describe('MongooseUserRepository', () => {
       expect(usersInDb[0].lastName).toEqual('Doe');
       expect(usersInDb[0].passwordHash).not.toEqual('password');
     });
+
+    it('throws error when user is duplicated', async () => {
+      const user = await User.createNewUser({
+        email: 'john@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'password',
+      });
+
+      await userRepository.create(user);
+      await expect(userRepository.create(user)).rejects.toThrowError();
+    });
   });
 });
