@@ -1,10 +1,18 @@
 import { Module } from '@nestjs/common';
-import { PublicApiAuthModule } from './auth/public-api-auth.module.js';
-import { UserModule } from '../../user.module.js';
-import { UserController } from './user/user.controller.js';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersPublicApiModule } from './users-public-api.module.js';
 
 @Module({
-  imports: [PublicApiAuthModule, UserModule],
-  controllers: [UserController],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get('MONGO_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    UsersPublicApiModule,
+  ],
 })
 export class PublicApiModule {}

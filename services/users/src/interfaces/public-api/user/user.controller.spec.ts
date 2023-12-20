@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { PublicApiModule } from '../public-api.module.js';
+import { UsersPublicApiModule } from '../users-public-api.module.js';
 import {
   UserDefinition,
   type UserModel,
@@ -40,7 +40,7 @@ describe('UserController', () => {
             uri: mongoServer.getUri(),
           }),
         }),
-        PublicApiModule,
+        UsersPublicApiModule,
       ],
     }).compile();
 
