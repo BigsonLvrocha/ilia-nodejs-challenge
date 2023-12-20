@@ -1,7 +1,6 @@
 import supertest from 'supertest';
-import jwt from 'jsonwebtoken';
 import { describe, beforeEach, afterEach, it, expect } from '@jest/globals';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 
 import { Test, type TestingModule } from '@nestjs/testing';
@@ -13,6 +12,7 @@ import {
   type TransactionModel,
 } from '../../../infrastructure/models/transaction.schema.js';
 import { v4 as uuid } from 'uuid';
+import { JwtService } from '@nestjs/jwt';
 
 describe('TransactionsController', () => {
   const userId = uuid();
@@ -37,12 +37,9 @@ describe('TransactionsController', () => {
     transactionModel = testModule.get(
       getModelToken(TransactionDefinition.name)
     );
-    const configService = testModule.get(ConfigService);
-    jwtToken = jwt.sign(
-      { userId },
-      configService.get('PUBLIC_API_JWT_SECRET') ?? 'default-secret',
-      { expiresIn: '1h' }
-    );
+
+    const jwtService = testModule.get<JwtService>(JwtService);
+    jwtToken = jwtService.sign({ userId }, { expiresIn: '1h' });
 
     await app.init();
   });
