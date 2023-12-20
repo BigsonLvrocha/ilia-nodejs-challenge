@@ -21,7 +21,7 @@ export class MongooseUserRepository implements UserRepositoryInterface {
   }
 
   async findAll(): Promise<User[]> {
-    const users = await this.userModel.find().exec();
+    const users = await this.userModel.find({ deletedAt: null }).exec();
     return users.map((user) => {
       return new User({
         id: user.id,
@@ -46,7 +46,7 @@ export class MongooseUserRepository implements UserRepositoryInterface {
   }
 
   async findById(id: string): Promise<User | null> {
-    const user = await this.userModel.findOne({ id }).exec();
+    const user = await this.userModel.findOne({ id, deletedAt: null }).exec();
 
     return user !== null
       ? new User({
@@ -60,7 +60,9 @@ export class MongooseUserRepository implements UserRepositoryInterface {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await this.userModel.findOne({ email }).exec();
+    const user = await this.userModel
+      .findOne({ email, deletedAt: null })
+      .exec();
 
     return user !== null
       ? new User({
@@ -71,5 +73,9 @@ export class MongooseUserRepository implements UserRepositoryInterface {
           passwordHash: user.passwordHash,
         })
       : null;
+  }
+
+  async delete(user: User): Promise<void> {
+    await this.userModel.updateOne({ id: user.id }, { deletedAt: new Date() });
   }
 }

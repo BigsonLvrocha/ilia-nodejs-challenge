@@ -21,7 +21,6 @@ export class UserDefinition {
   @Prop({
     required: true,
     index: true,
-    unique: true,
   })
   email!: string;
 
@@ -33,6 +32,13 @@ export class UserDefinition {
     default: Date.now,
   })
   createdAt!: Date;
+
+  @Prop({
+    index: true,
+    type: Date,
+    default: null,
+  })
+  deletedAt?: Date | null;
 }
 
 export type UserDocument = HydratedDocument<UserDefinition>;
