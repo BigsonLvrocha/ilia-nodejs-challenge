@@ -178,4 +178,59 @@ describe('UserController', () => {
       await supertest(app.getHttpServer()).get(`/users/${uuid()}`).expect(401);
     });
   });
+
+  describe('PATCH /users/:id', () => {
+    it('updates user when user is found', async () => {
+      const response = await supertest(app.getHttpServer())
+        .patch(`/users/${user.id}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          first_name: 'Jane',
+          last_name: 'Doe',
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('id', user.id);
+      expect(response.body).toHaveProperty('email', user.email);
+      expect(response.body).toHaveProperty('first_name', 'Jane');
+      expect(response.body).toHaveProperty('last_name', 'Doe');
+
+      const userInDB = await userModel.findOne({ id: user.id }).exec();
+      expect(userInDB).toHaveProperty('firstName', 'Jane');
+    });
+
+    it('returns 404 when user is not found', async () => {
+      const newUserId = uuid();
+      const newUserToken = await jwtService.signAsync({ userId: newUserId });
+      await supertest(app.getHttpServer())
+        .patch(`/users/${newUserId}`)
+        .set('Authorization', `Bearer ${newUserToken}`)
+        .send({
+          first_name: 'Jane',
+          last_name: 'Doe',
+        })
+        .expect(404);
+    });
+
+    it('returns 401 when token is not provided', async () => {
+      await supertest(app.getHttpServer())
+        .patch(`/users/${uuid()}`)
+        .send({
+          first_name: 'Jane',
+          last_name: 'Doe',
+        })
+        .expect(401);
+    });
+
+    it('return 401 id is not the same as user id', async () => {
+      await supertest(app.getHttpServer())
+        .patch(`/users/${uuid()}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          first_name: 'Jane',
+          last_name: 'Doe',
+        })
+        .expect(401);
+    });
+  });
 });
