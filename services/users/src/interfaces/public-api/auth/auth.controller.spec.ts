@@ -13,6 +13,7 @@ import {
 import { PublicApiAuthModule } from './public-api-auth.module.js';
 import { v4 as uuid } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
+import { ValidationPipe } from '@nestjs/common';
 
 describe('AuthController', () => {
   let testModule: TestingModule;
@@ -44,6 +45,8 @@ describe('AuthController', () => {
     }).compile();
 
     app = testModule.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
+
     await app.init();
     userModel = testModule.get<UserModel>(getModelToken(UserDefinition.name));
     jwtService = testModule.get<JwtService>(JwtService);
@@ -71,6 +74,41 @@ describe('AuthController', () => {
       );
 
       expect(payload.userId).toEqual(userData.id);
+    });
+
+    it('should return 401 when password is incorrect', async () => {
+      await supertest(app.getHttpServer())
+        .post('/auth')
+        .send({ email: userData.email, password: 'wrong-password' })
+        .expect(401);
+    });
+
+    it('should return 401 when email is incorrect', async () => {
+      await supertest(app.getHttpServer())
+        .post('/auth')
+        .send({ email: `wrong${userData.email}`, password: 'password' })
+        .expect(401);
+    });
+
+    it('should return 400 when email invalid', async () => {
+      await supertest(app.getHttpServer())
+        .post('/auth')
+        .send({ email: 'invalid email', password: 'password' })
+        .expect(400);
+    });
+
+    it('should return 400 when email is missing', async () => {
+      await supertest(app.getHttpServer())
+        .post('/auth')
+        .send({ password: 'password' })
+        .expect(400);
+    });
+
+    it('should return 400 when password is missing', async () => {
+      await supertest(app.getHttpServer())
+        .post('/auth')
+        .send({ email: userData.email })
+        .expect(400);
     });
   });
 });
