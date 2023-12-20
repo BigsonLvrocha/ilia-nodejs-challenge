@@ -62,7 +62,7 @@ describe('AuthUserUseCase', () => {
     ).rejects.toThrowError(UserAuthFailedException);
   });
 
-  it('returns user when auth is successful', async () => {
+  it('returns user id when auth is successful', async () => {
     const user = await User.createNewUser({
       email: 'john@gmail.com',
       firstName: 'John',
@@ -72,9 +72,11 @@ describe('AuthUserUseCase', () => {
 
     userRepositoryMock.findByEmail.mockResolvedValueOnce(user);
 
-    await useCase.execute({
+    const response = await useCase.execute({
       email: 'john@gmail.com',
       password: 'password',
     });
+
+    expect(response).toEqual({ userId: user.id });
   });
 });

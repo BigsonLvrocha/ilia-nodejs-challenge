@@ -9,7 +9,9 @@ interface AuthUserRequest {
   password: string;
 }
 
-type AuthUserResponse = undefined;
+interface AuthUserResponse {
+  userId: string;
+}
 
 @Injectable()
 export class AuthUserUseCase
@@ -32,5 +34,7 @@ export class AuthUserUseCase
     if (!validPassword) {
       throw new UserAuthFailedException();
     }
+
+    return { userId: user.id };
   }
 }
