@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TransactionType } from '../../domain/transaction-type.enum.js';
+import { TransactionType } from '../../../domain/transaction-type.enum.js';
 import { IsEnum, IsInt, IsNotEmpty, Min } from 'class-validator';
 
-export class TransactionDto {
+export class TransactionRequestDto {
   @ApiProperty()
   @IsNotEmpty()
   readonly userId!: string;

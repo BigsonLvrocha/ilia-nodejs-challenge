@@ -6,14 +6,14 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 
 import { Test, type TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { TransactionsPublicApiModule } from './transactions-public-api.module.js';
+import { TransactionsPublicApiModule } from '../transactions-public-api.module.js';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import {
   TransactionDefinition,
   type TransactionModel,
-} from '../../infrastructure/models/transaction.schema.js';
+} from '../../../infrastructure/models/transaction.schema.js';
 import { v4 as uuid } from 'uuid';
-import { AuthModule } from './auth/auth.module.js';
+import { AuthModule } from '../auth/auth.module.js';
 
 describe('TransactionsController', () => {
   const userId = uuid();

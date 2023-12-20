@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { User } from './auth/user.decorator.js';
-import { AuthUser } from './auth/auth-types.js';
-import { GetBalanceUseCase } from '../../use-cases/get-balance-use-case.js';
-import { AuthGuard } from './auth/auth-guard.js';
+import { User } from '../auth/user.decorator.js';
+import { AuthUser } from '../auth/auth-types.js';
+import { GetBalanceUseCase } from '../../../use-cases/get-balance-use-case.js';
+import { AuthGuard } from '../auth/auth-guard.js';
 
 @Controller('balance')
 export class BalanceController {

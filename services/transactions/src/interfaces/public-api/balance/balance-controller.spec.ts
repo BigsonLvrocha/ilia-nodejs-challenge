@@ -6,12 +6,12 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import {
   TransactionDefinition,
   type TransactionModel,
-} from '../../infrastructure/models/transaction.schema.js';
+} from '../../../infrastructure/models/transaction.schema.js';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
-import { AuthModule } from './auth/auth.module.js';
-import { TransactionsPublicApiModule } from './transactions-public-api.module.js';
+import { AuthModule } from '../auth/auth.module.js';
+import { TransactionsPublicApiModule } from '../transactions-public-api.module.js';
 import { ValidationPipe } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 
