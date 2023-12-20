@@ -8,6 +8,7 @@ import { TransactionsModule } from '../transactions.module.js';
 import { v4 as uuid } from 'uuid';
 import { ConfigModule } from '@nestjs/config';
 import { providersEnum } from '../providers.enum.js';
+import { JwtService } from '@nestjs/jwt';
 
 describe('AxiosTransactionsService', () => {
   const httpServiceMockFactory = (): {
@@ -31,6 +32,7 @@ describe('AxiosTransactionsService', () => {
   let testModule: TestingModule;
   let httpServiceMock: ReturnType<typeof httpServiceMockFactory>;
   let service: AxiosTransactionService;
+  let jwtService: JwtService;
   const userId = uuid();
 
   beforeEach(async () => {
@@ -55,6 +57,7 @@ describe('AxiosTransactionsService', () => {
 
     httpServiceMock = testModule.get(HttpService);
     service = testModule.get(providersEnum.TransactionsService);
+    jwtService = testModule.get(JwtService);
   });
 
   it('queries the balance via axios request', async () => {
@@ -66,5 +69,10 @@ describe('AxiosTransactionsService', () => {
         Authorization: expect.any(String),
       },
     });
+
+    const headers = httpServiceMock.get.mock.calls[0][1].headers;
+    const token = (headers.Authorization as string).replace('Bearer ', '');
+    const payload = await jwtService.verifyAsync(token);
+    expect(payload.userId).toBe(userId);
   });
 });
