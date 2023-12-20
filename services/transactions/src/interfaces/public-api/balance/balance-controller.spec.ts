@@ -10,7 +10,6 @@ import {
 import { Test, type TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
-import { AuthModule } from '../auth/auth.module.js';
 import { TransactionsPublicApiModule } from '../transactions-public-api.module.js';
 import { ValidationPipe } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
@@ -30,7 +29,6 @@ describe('BalanceController', () => {
       imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         MongooseModule.forRoot(mongoServer.getUri()),
-        AuthModule,
         TransactionsPublicApiModule,
       ],
     }).compile();
