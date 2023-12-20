@@ -7,6 +7,7 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { UserModule } from '../user.module.js';
 import { User } from '../domain/user.js';
 import { providersEnum } from '../providers.enum.js';
+import { v4 as uuid } from 'uuid';
 
 describe('MongooseUserRepository', () => {
   let mongoServer: MongoMemoryServer;
@@ -58,6 +59,35 @@ describe('MongooseUserRepository', () => {
 
       await userRepository.create(user);
       await expect(userRepository.create(user)).rejects.toThrowError();
+    });
+  });
+
+  describe('findAll', () => {
+    const users = [
+      {
+        id: uuid(),
+        email: 'john@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        passwordHash: 'password',
+      },
+      {
+        id: uuid(),
+        email: 'john2@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe 2',
+        passwordHash: 'password2',
+      },
+    ];
+
+    beforeEach(async () => {
+      await userModel.create(users);
+    });
+
+    it('returns all users', async () => {
+      const users = await userRepository.findAll();
+
+      expect(users).toHaveLength(2);
     });
   });
 });
