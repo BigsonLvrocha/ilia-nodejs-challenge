@@ -6,6 +6,7 @@ import {
   UserDefinition,
   UserSchema,
 } from './infrastructure/model/user.schema.js';
+import { CreateUserUseCase } from './use-cases/create-user-use-case.js';
 
 @Module({
   imports: [
@@ -18,6 +19,8 @@ import {
       provide: providersEnum.UserRepository,
       useClass: MongooseUserRepository,
     },
+    CreateUserUseCase,
   ],
+  exports: [CreateUserUseCase],
 })
 export class UserModule {}
