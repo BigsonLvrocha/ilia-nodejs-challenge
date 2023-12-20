@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../../../user.module.js';
 import { AuthController } from './auth.controller.js';
+import { AuthGuard } from './auth-guard.js';
 
 @Module({
   imports: [
@@ -18,5 +19,7 @@ import { AuthController } from './auth.controller.js';
     UserModule,
   ],
   controllers: [AuthController],
+  providers: [AuthGuard],
+  exports: [AuthGuard, JwtModule],
 })
 export class PublicApiAuthModule {}
