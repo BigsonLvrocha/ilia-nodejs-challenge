@@ -14,7 +14,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { TransactionRequestDto } from './transaction.request.dto.js';
 import { type TransactionResponseDto } from './transaction.response.dto.js';
 import { User } from '../auth/user.decorator.js';
-import { AuthUser } from '../auth/auth-types.js';
+import { ApiUser } from '../auth/api-user.js';
 import { ListTransactionsUseCase } from '../../../use-cases/list-transactions-use-case.js';
 import { ListTransactionsRequestDto } from './list-transactions.request.dto.js';
 
@@ -31,7 +31,7 @@ export class TransactionsController {
   @Post()
   async createTransaction(
     @Body() transaction: TransactionRequestDto,
-    @User() user: AuthUser
+    @User() user: ApiUser
   ): Promise<TransactionResponseDto> {
     if (user.userId !== transaction.userId) {
       throw new UnauthorizedException('Invalid user');
@@ -50,7 +50,7 @@ export class TransactionsController {
   @Get()
   async listTransactions(
     @Query() query: ListTransactionsRequestDto,
-    @User() user: AuthUser
+    @User() user: ApiUser
   ): Promise<TransactionResponseDto[]> {
     const results = await this.listTransactionsUseCase.execute({
       userId: user.userId,
