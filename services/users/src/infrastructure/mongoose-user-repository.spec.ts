@@ -150,4 +150,28 @@ describe('MongooseUserRepository', () => {
       expect(user?.passwordHash).toEqual(userData.passwordHash);
     });
   });
+
+  describe('findByEmail', () => {
+    const userData = {
+      id: uuid(),
+      email: 'john@gmail.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      passwordHash: 'password',
+    };
+
+    beforeEach(async () => {
+      await userModel.create(userData);
+    });
+
+    it('returns user by email', async () => {
+      const user = await userRepository.findByEmail(userData.email);
+      expect(user).toBeInstanceOf(User);
+      expect(user?.id).toEqual(userData.id);
+      expect(user?.email).toEqual(userData.email);
+      expect(user?.firstName).toEqual(userData.firstName);
+      expect(user?.lastName).toEqual(userData.lastName);
+      expect(user?.passwordHash).toEqual(userData.passwordHash);
+    });
+  });
 });
