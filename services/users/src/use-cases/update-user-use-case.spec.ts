@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { providersEnum } from '../providers.enum.js';
 import { User } from '../domain/user.js';
 import { UpdateUserUseCase } from './update-user-use-case.js';
+import { UserNotFoundException } from '../domain/error/user-not-found-exception.js';
 
 describe('UpdateUserUseCase', () => {
   const userRepositoryMockFactory = (): {
@@ -53,5 +54,20 @@ describe('UpdateUserUseCase', () => {
     expect(userRepositoryMock.findById).toHaveBeenCalledTimes(1);
     expect(userRepositoryMock.update).toHaveBeenCalledTimes(1);
     expect(userRepositoryMock.update).toHaveBeenCalledWith(user);
+  });
+
+  it('throws error when user is not found', async () => {
+    userRepositoryMock.findById.mockResolvedValueOnce(null);
+
+    await expect(
+      useCase.execute({
+        userId: '123',
+        data: {
+          firstName: 'John2',
+          email: 'john@gmail.com',
+          password: 'password2',
+        },
+      })
+    ).rejects.toThrowError(UserNotFoundException);
   });
 });
