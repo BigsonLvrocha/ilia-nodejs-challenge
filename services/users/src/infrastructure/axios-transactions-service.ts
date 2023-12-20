@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AxiosTransactionService implements TransactionsServiceInterface {
   private readonly baseUrl: string;
-  private readonly jwtSecret: string;
+  private readonly jwtSecret: string | undefined;
 
   constructor(
     private readonly httpService: HttpService,
@@ -16,7 +16,7 @@ export class AxiosTransactionService implements TransactionsServiceInterface {
     private readonly configService: ConfigService
   ) {
     this.baseUrl = this.configService.get('TRANSACTIONS_SERVICE_URL') ?? '';
-    this.jwtSecret = this.configService.get('PRIVATE_API_JWT_SECRET') ?? '';
+    this.jwtSecret = this.configService.get('PRIVATE_API_JWT_SECRET');
   }
 
   async getBalance(userId: string): Promise<number> {
