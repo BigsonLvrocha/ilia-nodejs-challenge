@@ -97,4 +97,60 @@ describe('UserController', () => {
       await supertest(app.getHttpServer()).get('/users').expect(401);
     });
   });
+
+  describe('POST /users', () => {
+    it('creates a new user', async () => {
+      const response = await supertest(app.getHttpServer())
+        .post('/users')
+        .send({
+          email: 'john@gmail.com',
+          first_name: 'John',
+          last_name: 'Doe',
+          password: 'strongPasswordPassingTHrough00!',
+        })
+        .expect(200);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body).toHaveProperty('email', 'john@gmail.com');
+      expect(response.body).toHaveProperty('first_name', 'John');
+      expect(response.body).toHaveProperty('last_name', 'Doe');
+
+      const userInDb = await userModel.findOne({ id: response.body.id }).exec();
+      expect(userInDb).not.toBeNull();
+    });
+
+    it('returns 400 when password is weak', async () => {
+      await supertest(app.getHttpServer())
+        .post('/users')
+        .send({
+          email: 'john@gmail.com',
+          first_name: 'John',
+          last_name: 'Doe',
+          password: 'password',
+        })
+        .expect(400);
+    });
+
+    it('returns 400 when email is invalid', async () => {
+      await supertest(app.getHttpServer())
+        .post('/users')
+        .send({
+          email: 'john',
+          first_name: 'John',
+          last_name: 'Doe',
+          password: 'strongPasswordPassingTHrough00!',
+        })
+        .expect(400);
+    });
+
+    it('returns 400 when email is missing', async () => {
+      await supertest(app.getHttpServer())
+        .post('/users')
+        .send({
+          first_name: 'John',
+          last_name: 'Doe',
+          password: 'strongPasswordPassingTHrough00!',
+        })
+        .expect(400);
+    });
+  });
 });
