@@ -3,6 +3,7 @@ import { type UserRepositoryInterface } from '../domain/user-repository-interfac
 import { User } from '../domain/user.js';
 import { type UseCaseInterface } from './use-case-interface.js';
 import { providersEnum } from '../providers.enum.js';
+import { UserEmailTakenException } from '../domain/error/user-email-taken-exception.js';
 
 interface CreateUserUseCaseRequest {
   email: string;
@@ -31,6 +32,11 @@ export class CreateUserUseCase
   async execute(
     request: CreateUserUseCaseRequest
   ): Promise<CreateUserUseCaseResponse> {
+    const userInDb = await this.userRepository.findByEmail(request.email);
+    if (userInDb !== null) {
+      throw new UserEmailTakenException();
+    }
+
     const user = await User.createNewUser(request);
     await this.userRepository.create(user);
     return {
