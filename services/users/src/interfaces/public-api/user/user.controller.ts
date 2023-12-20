@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -11,12 +12,14 @@ import { AuthGuard } from '../auth/auth-guard.js';
 import { type UserResponseDto } from './user.response.dto.js';
 import { CreateUserUseCase } from '../../../use-cases/create-user-use-case.js';
 import { UserRequestDto } from './user.request.dto.js';
+import { ReadUserUseCase } from '../../../use-cases/read-user-use-case.js';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly listUsersUseCase: ListUsersUseCase,
-    private readonly createUserUseCase: CreateUserUseCase
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly readUserUseCase: ReadUserUseCase
   ) {}
 
   @Get()
@@ -46,6 +49,18 @@ export class UserController {
       first_name: user.firstName,
       last_name: user.lastName,
       id: user.id,
+    };
+  }
+
+  @Get(':id')
+  @UseGuards(AuthGuard)
+  async getUser(@Param('id') id: string): Promise<UserResponseDto> {
+    const user = await this.readUserUseCase.execute({ userId: id });
+    return {
+      id: user.id,
+      email: user.email,
+      first_name: user.firstName,
+      last_name: user.lastName,
     };
   }
 }

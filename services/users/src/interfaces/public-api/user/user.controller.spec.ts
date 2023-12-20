@@ -153,4 +153,29 @@ describe('UserController', () => {
         .expect(400);
     });
   });
+
+  describe('GET /users/:id', () => {
+    it('returns user when user is found', async () => {
+      const response = await supertest(app.getHttpServer())
+        .get(`/users/${user.id}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body).toHaveProperty('email', user.email);
+      expect(response.body).toHaveProperty('first_name', user.firstName);
+      expect(response.body).toHaveProperty('last_name', user.lastName);
+    });
+
+    it('returns 404 when user is not found', async () => {
+      await supertest(app.getHttpServer())
+        .get(`/users/${uuid()}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(404);
+    });
+
+    it('returns 401 when token is not provided', async () => {
+      await supertest(app.getHttpServer()).get(`/users/${uuid()}`).expect(401);
+    });
+  });
 });
