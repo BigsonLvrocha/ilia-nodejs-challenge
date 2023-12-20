@@ -8,7 +8,7 @@ import { UsersPublicApiModule } from './users-public-api.module.js';
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
-        uri: config.get('MONGO_URI'),
+        uri: config.get('MONGODB_URI'),
       }),
       inject: [ConfigService],
     }),
