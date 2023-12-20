@@ -13,7 +13,6 @@ import {
   type TransactionModel,
 } from '../../../infrastructure/models/transaction.schema.js';
 import { v4 as uuid } from 'uuid';
-import { AuthModule } from '../auth/auth.module.js';
 
 describe('TransactionsController', () => {
   const userId = uuid();
@@ -29,7 +28,6 @@ describe('TransactionsController', () => {
       imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         MongooseModule.forRoot(server.getUri()),
-        AuthModule,
         TransactionsPublicApiModule,
       ],
     }).compile();
