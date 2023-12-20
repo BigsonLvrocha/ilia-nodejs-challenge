@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { providersEnum } from '../providers.enum.js';
 import { UserRepositoryInterface } from '../domain/user-repository-interface.js';
 import { type UseCaseInterface } from './use-case-interface.js';
@@ -10,6 +10,7 @@ interface DeleteUserUseCaseRequest {
 
 type DeleteUserUseCaseResponse = undefined;
 
+@Injectable()
 export class DeleteUserUseCase
   implements
     UseCaseInterface<DeleteUserUseCaseRequest, DeleteUserUseCaseResponse>

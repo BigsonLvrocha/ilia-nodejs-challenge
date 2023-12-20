@@ -7,6 +7,11 @@ import {
   UserSchema,
 } from './infrastructure/model/user.schema.js';
 import { CreateUserUseCase } from './use-cases/create-user-use-case.js';
+import { AuthUserUseCase } from './use-cases/auth-user-use-case.js';
+import { DeleteUserUseCase } from './use-cases/delete-user-use-case.js';
+import { ListUsersUseCase } from './use-cases/list-users-use-case.js';
+import { ReadUserUseCase } from './use-cases/read-user-use-case.js';
+import { UpdateUserUseCase } from './use-cases/update-user-use-case.js';
 
 @Module({
   imports: [
@@ -20,7 +25,19 @@ import { CreateUserUseCase } from './use-cases/create-user-use-case.js';
       useClass: MongooseUserRepository,
     },
     CreateUserUseCase,
+    AuthUserUseCase,
+    DeleteUserUseCase,
+    ListUsersUseCase,
+    ReadUserUseCase,
+    UpdateUserUseCase,
   ],
-  exports: [CreateUserUseCase],
+  exports: [
+    CreateUserUseCase,
+    AuthUserUseCase,
+    DeleteUserUseCase,
+    ListUsersUseCase,
+    ReadUserUseCase,
+    UpdateUserUseCase,
+  ],
 })
 export class UserModule {}
