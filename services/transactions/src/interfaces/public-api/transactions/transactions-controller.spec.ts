@@ -128,6 +128,19 @@ describe('TransactionsController', () => {
         })
         .expect(400);
     });
+
+    it('returns 401 if user_id is not the same as the token', async () => {
+      await supertest(app.getHttpServer())
+        .post('/transactions')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          amount: 100,
+          type: 'CREDIT',
+          user_id: uuid(),
+        })
+        .expect(401);
+    });
   });
 
   describe('POST /transactions', () => {
