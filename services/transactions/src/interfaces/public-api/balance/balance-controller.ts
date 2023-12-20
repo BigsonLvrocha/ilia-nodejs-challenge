@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { User } from '../auth/user.decorator.js';
-import { AuthUser } from '../auth/auth-types.js';
+import { ApiUser } from '../auth/api-user.js';
 import { GetBalanceUseCase } from '../../../use-cases/get-balance-use-case.js';
 import { AuthGuard } from '../auth/auth-guard.js';
 
@@ -12,7 +12,7 @@ export class BalanceController {
   @Get()
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  async getBalance(@User() user: AuthUser): Promise<{ amount: number }> {
+  async getBalance(@User() user: ApiUser): Promise<{ amount: number }> {
     const result = await this.getBalanceUseCase.execute({
       userId: user.userId,
     });
