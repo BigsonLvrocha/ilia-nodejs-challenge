@@ -18,7 +18,7 @@ export class AxiosTransactionService implements TransactionsServiceInterface {
   }
 
   async getBalance(userId: string): Promise<number> {
-    const token = this.jwtService.sign({ userId });
+    const token = await this.jwtService.signAsync({ userId });
     const { data } = await firstValueFrom(
       this.httpService.get(`${this.baseUrl}/balance`, {
         headers: { Authorization: `Bearer ${token}` },
