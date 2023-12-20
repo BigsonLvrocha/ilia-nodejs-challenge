@@ -1,5 +1,3 @@
-export function hello(): string {
-  return 'hello world';
-}
+import { startPublicApiApp } from './interfaces/public-api/public-api.app.js';
 
-console.log(hello());
+await startPublicApiApp();
