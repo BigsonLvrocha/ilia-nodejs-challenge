@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
 import { describe, beforeEach, it, expect, afterEach } from '@jest/globals';
 import { type NestApplication } from '@nestjs/core';
@@ -8,11 +7,12 @@ import {
   type TransactionModel,
 } from '../../../infrastructure/models/transaction.schema.js';
 import { Test, type TestingModule } from '@nestjs/testing';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { TransactionsPublicApiModule } from '../transactions-public-api.module.js';
 import { ValidationPipe } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
+import { JwtService } from '@nestjs/jwt';
 
 describe('BalanceController', () => {
   let mongoServer: MongoMemoryServer;
@@ -38,12 +38,9 @@ describe('BalanceController', () => {
     transactionModel = testModule.get(
       getModelToken(TransactionDefinition.name)
     );
-    const configService = testModule.get(ConfigService);
-    jwtToken = jwt.sign(
-      { userId },
-      configService.get('PUBLIC_API_JWT_SECRET') ?? 'default-secret',
-      { expiresIn: '1h' }
-    );
+
+    const jwtService = testModule.get<JwtService>(JwtService);
+    jwtToken = jwtService.sign({ userId }, { expiresIn: '1h' });
 
     await testApp.init();
     await testApp.init();
