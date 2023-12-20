@@ -233,4 +233,38 @@ describe('UserController', () => {
         .expect(401);
     });
   });
+
+  describe('DELETE /users/:id', () => {
+    it('deletes user when user is found', async () => {
+      await supertest(app.getHttpServer())
+        .delete(`/users/${user.id}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      const userInDB = await userModel.findOne({ id: user.id }).exec();
+      expect(userInDB?.deletedAt).not.toBeNull();
+    });
+
+    it('returns 404 when user is not found', async () => {
+      const newUserId = uuid();
+      const newUserToken = await jwtService.signAsync({ userId: newUserId });
+      await supertest(app.getHttpServer())
+        .delete(`/users/${newUserId}`)
+        .set('Authorization', `Bearer ${newUserToken}`)
+        .expect(404);
+    });
+
+    it('returns 401 when token is not provided', async () => {
+      await supertest(app.getHttpServer())
+        .delete(`/users/${uuid()}`)
+        .expect(401);
+    });
+
+    it('return 401 id is not the same as user id', async () => {
+      await supertest(app.getHttpServer())
+        .delete(`/users/${uuid()}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(401);
+    });
+  });
 });

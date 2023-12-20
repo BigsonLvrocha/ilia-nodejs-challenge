@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -19,6 +20,7 @@ import { UpdateUserUseCase } from '../../../use-cases/update-user-use-case.js';
 import { PatchUserRequestDto } from './patch-user.request.dto.js';
 import { User } from '../auth/user.decorator.js';
 import { ApiUser } from '../auth/api-user.js';
+import { DeleteUserUseCase } from '../../../use-cases/delete-user-use-case.js';
 
 @Controller('users')
 export class UserController {
@@ -26,7 +28,8 @@ export class UserController {
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly readUserUseCase: ReadUserUseCase,
-    private readonly updateUserUseCase: UpdateUserUseCase
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase
   ) {}
 
   @Get()
@@ -96,5 +99,17 @@ export class UserController {
       first_name: user.firstName,
       last_name: user.lastName,
     };
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  async deleteUser(
+    @Param('id') id: string,
+    @User() apiUser: ApiUser
+  ): Promise<void> {
+    if (id !== apiUser.userId) {
+      throw new UnauthorizedException();
+    }
+    await this.deleteUserUseCase.execute({ id });
   }
 }
