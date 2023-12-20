@@ -5,7 +5,7 @@ import { IsEnum, IsInt, IsNotEmpty, Min } from 'class-validator';
 export class TransactionRequestDto {
   @ApiProperty()
   @IsNotEmpty()
-  readonly userId!: string;
+  readonly user_id!: string;
 
   @ApiProperty()
   @IsInt()

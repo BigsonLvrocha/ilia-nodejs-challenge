@@ -59,7 +59,7 @@ describe('TransactionsController', () => {
         .send({
           amount: 100,
           type: 'CREDIT',
-          userId,
+          user_id: userId,
         })
         .expect(200);
 
@@ -85,7 +85,7 @@ describe('TransactionsController', () => {
         .send({
           amount: 100,
           type: 'CREDIT',
-          userId,
+          user_id: userId,
         })
         .expect(401);
     });
@@ -98,7 +98,7 @@ describe('TransactionsController', () => {
         .send({
           amount: 100,
           type: 'CREDITA',
-          userId,
+          user_id: userId,
         })
         .expect(400);
     });
@@ -111,7 +111,7 @@ describe('TransactionsController', () => {
         .send({
           amount: 100.1,
           type: 'CREDIT',
-          userId,
+          user_id: userId,
         })
         .expect(400);
     });
@@ -124,7 +124,7 @@ describe('TransactionsController', () => {
         .send({
           amount: -100,
           type: 'CREDIT',
-          userId,
+          user_id: userId,
         })
         .expect(400);
     });
