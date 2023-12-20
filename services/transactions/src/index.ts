@@ -1,5 +1,4 @@
-export function hello(): string {
-  return 'hello world';
-}
+import { startPublicApiApp } from './interfaces/public-api/public-api.app.js';
+import { startPrivateApiApp } from './interfaces/internal-api/private-api.app.js';
 
-console.log(hello());
+await Promise.all([startPublicApiApp(), startPrivateApiApp()]);
