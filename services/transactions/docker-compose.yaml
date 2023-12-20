@@ -18,7 +18,6 @@ services:
       PRIVATE_API_JWT_SECRET: ILIACHALLENGE_IN
     ports:
       - 3001:3001
-      - 3003:3003
     depends_on:
       - transactions-db
     networks:
