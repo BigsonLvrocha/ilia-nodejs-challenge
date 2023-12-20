@@ -1,5 +1,12 @@
 import supertest from 'supertest';
-import { describe, beforeEach, afterEach, it, expect } from '@jest/globals';
+import {
+  describe,
+  beforeEach,
+  afterEach,
+  it,
+  expect,
+  jest,
+} from '@jest/globals';
 import { type INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -12,13 +19,35 @@ import {
   type UserModel,
 } from '../../../infrastructure/model/user.schema.js';
 import { v4 as uuid } from 'uuid';
+import { Observable } from 'rxjs';
+import { AxiosHeaders, type AxiosResponse } from 'axios';
+import { HttpService } from '@nestjs/axios';
 
 describe('UserController', () => {
   let mongoServer: MongoMemoryServer;
   let testModule: TestingModule;
   let app: INestApplication;
   let jwtService: JwtService;
+  const testSecret = 'test-public-api-jwt-secret';
   let userModel: UserModel;
+
+  const httpServiceMockFactory = (): {
+    get: jest.Mock<(url: string, config?: any) => Observable<AxiosResponse>>;
+  } => ({
+    get: jest.fn(
+      () =>
+        new Observable((subscribe) => {
+          subscribe.next({
+            data: { balance: 0 },
+            status: 200,
+            statusText: 'success',
+            headers: {},
+            config: { headers: new AxiosHeaders() },
+          });
+          subscribe.complete();
+        })
+    ),
+  });
 
   const user = {
     id: uuid(),
@@ -34,7 +63,15 @@ describe('UserController', () => {
     mongoServer = await MongoMemoryServer.create();
     testModule = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({
+          isGlobal: true,
+          load: [
+            () => ({
+              PUBLIC_API_JWT_SECRET: testSecret,
+              PRIVATE_API_JWT_SECRET: 'test-private-api-jwt-secret',
+            }),
+          ],
+        }),
         MongooseModule.forRootAsync({
           useFactory: async () => ({
             uri: mongoServer.getUri(),
@@ -42,7 +79,12 @@ describe('UserController', () => {
         }),
         UsersPublicApiModule,
       ],
-    }).compile();
+    })
+      .overrideProvider(HttpService)
+      .useFactory({
+        factory: httpServiceMockFactory,
+      })
+      .compile();
 
     app = testModule.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -53,7 +95,13 @@ describe('UserController', () => {
     jwtService = testModule.get<JwtService>(JwtService);
 
     await userModel.create(user);
-    userToken = await jwtService.signAsync({ userId: user.id });
+    userToken = await jwtService.signAsync(
+      { userId: user.id },
+      {
+        secret: testSecret,
+        expiresIn: '1h',
+      }
+    );
   });
 
   afterEach(async () => {
@@ -201,7 +249,13 @@ describe('UserController', () => {
 
     it('returns 404 when user is not found', async () => {
       const newUserId = uuid();
-      const newUserToken = await jwtService.signAsync({ userId: newUserId });
+      const newUserToken = await jwtService.signAsync(
+        { userId: newUserId },
+        {
+          secret: testSecret,
+          expiresIn: '1h',
+        }
+      );
       await supertest(app.getHttpServer())
         .patch(`/users/${newUserId}`)
         .set('Authorization', `Bearer ${newUserToken}`)
@@ -247,7 +301,13 @@ describe('UserController', () => {
 
     it('returns 404 when user is not found', async () => {
       const newUserId = uuid();
-      const newUserToken = await jwtService.signAsync({ userId: newUserId });
+      const newUserToken = await jwtService.signAsync(
+        { userId: newUserId },
+        {
+          secret: testSecret,
+          expiresIn: '1h',
+        }
+      );
       await supertest(app.getHttpServer())
         .delete(`/users/${newUserId}`)
         .set('Authorization', `Bearer ${newUserToken}`)

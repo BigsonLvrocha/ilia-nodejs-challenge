@@ -12,12 +12,14 @@ import { DeleteUserUseCase } from './use-cases/delete-user-use-case.js';
 import { ListUsersUseCase } from './use-cases/list-users-use-case.js';
 import { ReadUserUseCase } from './use-cases/read-user-use-case.js';
 import { UpdateUserUseCase } from './use-cases/update-user-use-case.js';
+import { TransactionsModule } from './transactions.module.js';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: UserDefinition.name, schema: UserSchema },
     ]),
+    TransactionsModule,
   ],
   providers: [
     {

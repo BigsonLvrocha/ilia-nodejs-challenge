@@ -9,6 +9,7 @@ import { UserModule } from '../user.module.js';
 import { User } from '../domain/user.js';
 import { providersEnum } from '../providers.enum.js';
 import { v4 as uuid } from 'uuid';
+import { ConfigModule } from '@nestjs/config';
 
 describe('MongooseUserRepository', () => {
   let mongoServer: MongoMemoryServer;
@@ -19,7 +20,11 @@ describe('MongooseUserRepository', () => {
   beforeEach(async () => {
     mongoServer = await MongoMemoryServer.create();
     testModule = await Test.createTestingModule({
-      imports: [MongooseModule.forRoot(mongoServer.getUri()), UserModule],
+      imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        MongooseModule.forRoot(mongoServer.getUri()),
+        UserModule,
+      ],
     }).compile();
 
     userModel = testModule.get(getModelToken(UserDefinition.name));

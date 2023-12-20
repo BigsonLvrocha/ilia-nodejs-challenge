@@ -33,6 +33,7 @@ describe('AxiosTransactionsService', () => {
   let httpServiceMock: ReturnType<typeof httpServiceMockFactory>;
   let service: AxiosTransactionService;
   let jwtService: JwtService;
+  const testSecret = 'test-private-api-jwt-secret';
   const userId = uuid();
 
   beforeEach(async () => {
@@ -42,7 +43,7 @@ describe('AxiosTransactionsService', () => {
           isGlobal: true,
           load: [
             () => ({
-              PRIVATE_API_JWT_SECRET: 'test-private-api-jwt-secret',
+              PRIVATE_API_JWT_SECRET: testSecret,
             }),
           ],
         }),
@@ -72,7 +73,9 @@ describe('AxiosTransactionsService', () => {
 
     const headers = httpServiceMock.get.mock.calls[0][1].headers;
     const token = (headers.Authorization as string).replace('Bearer ', '');
-    const payload = await jwtService.verifyAsync(token);
+    const payload = await jwtService.verifyAsync(token, {
+      secret: testSecret,
+    });
     expect(payload.userId).toBe(userId);
   });
 });
