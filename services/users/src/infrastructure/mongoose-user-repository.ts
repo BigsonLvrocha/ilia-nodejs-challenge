@@ -32,4 +32,16 @@ export class MongooseUserRepository implements UserRepositoryInterface {
       });
     });
   }
+
+  async update(user: User): Promise<void> {
+    await this.userModel.updateOne(
+      { id: user.id },
+      {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        passwordHash: user.passwordHash,
+      }
+    );
+  }
 }

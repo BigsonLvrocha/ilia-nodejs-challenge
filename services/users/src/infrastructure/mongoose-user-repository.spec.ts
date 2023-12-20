@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { describe, beforeEach, it, expect, afterEach } from '@jest/globals';
@@ -88,6 +89,41 @@ describe('MongooseUserRepository', () => {
       const users = await userRepository.findAll();
 
       expect(users).toHaveLength(2);
+    });
+  });
+
+  describe('update', () => {
+    const userData = {
+      id: uuid(),
+      email: 'john@gmail.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      passwordHash: 'password',
+    };
+
+    beforeEach(async () => {
+      await userModel.create(userData);
+    });
+
+    it('updates user data', async () => {
+      const userEntity = new User(userData);
+
+      await userEntity.changePassword('password2');
+      userEntity.changeFirstName('John 2');
+      userEntity.changeLastName('Doe 2');
+      userEntity.changeEmail('john2@gmail.com');
+
+      await userRepository.update(userEntity);
+
+      const usersInDb = await userModel.find().exec();
+      expect(usersInDb).toHaveLength(1);
+      expect(usersInDb[0].email).toEqual('john2@gmail.com');
+      expect(usersInDb[0].firstName).toEqual('John 2');
+      expect(usersInDb[0].lastName).toEqual('Doe 2');
+      expect(usersInDb[0].passwordHash).not.toEqual('password');
+      expect(await bcrypt.compare('password2', usersInDb[0].passwordHash)).toBe(
+        true
+      );
     });
   });
 });
